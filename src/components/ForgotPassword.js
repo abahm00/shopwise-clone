@@ -35,9 +35,12 @@ const ForgotPassword = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:5000/users", {
-        params: { email },
-      });
+      const response = await axios.get(
+        "https://rebel-fishy-airship.glitch.me/users",
+        {
+          params: { email },
+        }
+      );
 
       if (response.data.length === 0) {
         setError("User with this email not found.");
@@ -47,7 +50,10 @@ const ForgotPassword = () => {
       const user = response.data[0];
       const updatedUser = { ...user, password: newPassword };
 
-      await axios.put(`http://localhost:5000/users/${user.id}`, updatedUser);
+      await axios.put(
+        `https://rebel-fishy-airship.glitch.me/users/${user.id}`,
+        updatedUser
+      );
 
       setMessage("Password updated successfully.");
       setEmail("");
