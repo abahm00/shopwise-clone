@@ -49,9 +49,12 @@ export default function ProductDescription() {
       };
 
       if (user) {
-        const userResponse = await axios.get("http://localhost:5000/users", {
-          params: { email: user.email },
-        });
+        const userResponse = await axios.get(
+          "https://rebel-fishy-airship.glitch.me/users",
+          {
+            params: { email: user.email },
+          }
+        );
 
         const currentUser = userResponse.data[0];
 
@@ -67,9 +70,12 @@ export default function ProductDescription() {
           currentUser.cart.push(cartItem);
         }
 
-        await axios.patch(`http://localhost:5000/users/${currentUser.id}`, {
-          cart: currentUser.cart,
-        });
+        await axios.patch(
+          `https://rebel-fishy-airship.glitch.me/users/${currentUser.id}`,
+          {
+            cart: currentUser.cart,
+          }
+        );
 
         alert("Product added to cart!");
       } else {
