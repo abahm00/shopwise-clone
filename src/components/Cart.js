@@ -12,28 +12,25 @@ export default function Cart() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (user) {
-      localStorage.removeItem("cart");
-    }
-
+    // Fetch cart data from the server or localStorage based on the user
     const fetchCart = async () => {
       if (user) {
         try {
           const response = await axios.get(
-            `http://localhost:5000/users/${user.id}`
+            `https://rebel-fishy-airship.glitch.me/users/${user.id}`
           );
-          setCart(response.data.cart);
+          setCart(response.data.cart); // Update cart with server data
         } catch (err) {
           setError("Failed to fetch cart items.");
         }
       } else {
         const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-        setCart(localCart);
+        setCart(localCart); // Use localStorage for unauthenticated users
       }
     };
 
-    fetchCart();
-  }, [user]);
+    fetchCart(); // Trigger fetch only once when the component mounts
+  }, [user]); // Dependency array ensures it runs when 'user' changes
 
   const handleCheckout = () => {
     if (cart.length > 0) {
@@ -43,43 +40,63 @@ export default function Cart() {
     }
   };
 
-  const handleQuantityChange = async (productId, selectedSize, newQuantity) => {
+  const handleQuantityChange = async (
+    productId,
+    selectedSize,
+    selectedColor,
+    newQuantity
+  ) => {
     const updatedCart = cart.map((item) =>
-      item.id === productId && item.selectedSize === selectedSize
+      item.id === productId &&
+      item.selectedSize === selectedSize &&
+      item.selectedColor === selectedColor
         ? { ...item, quantity: newQuantity }
         : item
     );
-    setCart(updatedCart);
+    setCart(updatedCart); // Update cart state
 
+    // Update cart in localStorage or backend (for authenticated users)
     if (user) {
       try {
-        await axios.patch(`http://localhost:5000/users/${user.id}`, {
-          cart: updatedCart,
-        });
+        await axios.patch(
+          `https://rebel-fishy-airship.glitch.me/users/${user.id}`,
+          {
+            cart: updatedCart,
+          }
+        );
       } catch (err) {
         setError("Failed to update cart on server.");
       }
     } else {
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Update localStorage for unauthenticated users
     }
   };
 
-  const handleRemoveItem = async (productId, selectedSize) => {
+  const handleRemoveItem = async (productId, selectedSize, selectedColor) => {
     const updatedCart = cart.filter(
-      (item) => !(item.id === productId && item.selectedSize === selectedSize)
+      (item) =>
+        !(
+          item.id === productId &&
+          item.selectedSize === selectedSize &&
+          item.selectedColor === selectedColor
+        )
     );
+
+    // Update state and localStorage immediately
     setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
 
     if (user) {
       try {
-        await axios.patch(`http://localhost:5000/users/${user.id}`, {
-          cart: updatedCart,
-        });
+        await axios.patch(
+          `https://rebel-fishy-airship.glitch.me/users/${user.id}`,
+          {
+            cart: updatedCart,
+          }
+        );
       } catch (err) {
         setError("Failed to remove item from cart on server.");
       }
-    } else {
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
     }
   };
 
@@ -99,7 +116,7 @@ export default function Cart() {
           <div className="space-y-4">
             {cart.map((item) => (
               <div
-                key={`${item.id}-${item.selectedSize}`}
+                key={`${item.id}-${item.selectedSize}-${item.selectedColor}`} // Unique key for each item
                 className="flex flex-col sm:flex-row items-center justify-between p-4 border-b"
               >
                 <img
@@ -136,6 +153,7 @@ export default function Cart() {
                       handleQuantityChange(
                         item.id,
                         item.selectedSize,
+                        item.selectedColor,
                         item.quantity - 1
                       )
                     }
@@ -152,6 +170,7 @@ export default function Cart() {
                       handleQuantityChange(
                         item.id,
                         item.selectedSize,
+                        item.selectedColor,
                         item.quantity + 1
                       )
                     }
@@ -162,7 +181,13 @@ export default function Cart() {
                 </div>
 
                 <button
-                  onClick={() => handleRemoveItem(item.id, item.selectedSize)}
+                  onClick={() =>
+                    handleRemoveItem(
+                      item.id,
+                      item.selectedSize,
+                      item.selectedColor
+                    )
+                  }
                   className="text-red-600 hover:text-red-700 mt-2 sm:mt-0"
                 >
                   <FontAwesomeIcon icon={faTrash} size="lg" className="mr-2" />
