@@ -47,6 +47,11 @@ export default function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
+  const handleHomeClick = () => {
+    navigate("/");
+    setIsMobileMenuOpen(false);
+  };
+
   const handleLoginClick = () => {
     navigate("/Login");
     setIsMobileMenuOpen(false);
@@ -59,11 +64,11 @@ export default function Navbar() {
 
   return (
     <div className="h-fit bg-gray-200 p-2 shadow-md border-b border-gray-500 w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="w-full flex justify-center mx-auto px-4 sm:px-6 lg:px-0">
+        <div className="md:w-3/4 w-full flex items-center justify-between h-16">
           <div
             className="flex-shrink-0 cursor-pointer"
-            onClick={() => navigate("/")}
+            onClick={handleHomeClick}
           >
             <img src={logo} alt="Logo" className="h-10 sm:h-12" />
           </div>
