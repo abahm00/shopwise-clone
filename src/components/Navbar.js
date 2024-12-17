@@ -37,7 +37,7 @@ export default function Navbar() {
     if (query) {
       navigate(`/search/${query}`);
     } else {
-      navigate("/search");
+      navigate("/");
     }
     setIsMobileMenuOpen(false);
   };
