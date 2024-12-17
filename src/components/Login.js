@@ -21,9 +21,12 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:5000/users", {
-        params: { email, password },
-      });
+      const response = await axios.get(
+        "https://rebel-fishy-airship.glitch.me/users",
+        {
+          params: { email, password },
+        }
+      );
 
       if (response.data.length > 0) {
         const user = response.data[0];
