@@ -62,7 +62,7 @@ const Signup = () => {
 
     try {
       const emailCheckResponse = await axios.get(
-        "http://localhost:5000/users",
+        "https://rebel-fishy-airship.glitch.me/users",
         {
           params: { email },
         }
@@ -73,7 +73,7 @@ const Signup = () => {
         return;
       }
 
-      await axios.post("http://localhost:5000/users", {
+      await axios.post("https://rebel-fishy-airship.glitch.me/users", {
         name,
         email,
         password,
