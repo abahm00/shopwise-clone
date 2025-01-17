@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { TextField, Button, Typography, Box, Grid } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Grid,
+  Alert,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -8,14 +18,24 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false); // Independent toggle for New Password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Independent toggle for Confirm Password
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const passwordRegex =
     /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,12}$/;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!email) {
+      setError("Please enter your email address.");
+      return;
+    }
 
     if (!newPassword || !confirmPassword) {
       setError("Please fill in both password fields.");
@@ -35,6 +55,7 @@ const ForgotPassword = () => {
     }
 
     try {
+      setIsSubmitting(true);
       const response = await axios.get(
         "https://rebel-fishy-airship.glitch.me/users",
         {
@@ -44,6 +65,7 @@ const ForgotPassword = () => {
 
       if (response.data.length === 0) {
         setError("User with this email not found.");
+        setIsSubmitting(false);
         return;
       }
 
@@ -65,6 +87,8 @@ const ForgotPassword = () => {
       }, 2000);
     } catch (err) {
       setError("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -84,7 +108,12 @@ const ForgotPassword = () => {
         sm={8}
         md={6}
         lg={4}
-        sx={{ backgroundColor: "white", borderRadius: 2, boxShadow: 3, p: 3 }}
+        sx={{
+          backgroundColor: "white",
+          borderRadius: 2,
+          boxShadow: 3,
+          p: 3,
+        }}
       >
         <Typography
           variant="h5"
@@ -96,20 +125,15 @@ const ForgotPassword = () => {
         </Typography>
 
         {error && (
-          <Typography variant="body2" color="error" align="center" gutterBottom>
+          <Alert severity="error" sx={{ mb: 2 }}>
             {error}
-          </Typography>
+          </Alert>
         )}
 
         {message && (
-          <Typography
-            variant="body2"
-            color="success"
-            align="center"
-            gutterBottom
-          >
+          <Alert severity="success" sx={{ mb: 2 }}>
             {message}
-          </Typography>
+          </Alert>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -121,25 +145,65 @@ const ForgotPassword = () => {
               variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              aria-label="Email"
+              disabled={isSubmitting}
             />
             <TextField
               label="New Password"
-              type="password"
+              type={showNewPassword ? "text" : "password"}
               fullWidth
               variant="outlined"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              aria-label="New Password"
+              disabled={isSubmitting}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowNewPassword((prev) => !prev)}
+                      edge="end"
+                      aria-label="toggle new password visibility"
+                    >
+                      {showNewPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               label="Confirm Password"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               fullWidth
               variant="outlined"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              aria-label="Confirm Password"
+              disabled={isSubmitting}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() =>
+                        setShowConfirmPassword((prev) => !prev)
+                      }
+                      edge="end"
+                      aria-label="toggle confirm password visibility"
+                    >
+                      {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
-            <Button type="submit" variant="contained" color="error" fullWidth>
-              Reset Password
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              fullWidth
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Processing..." : "Reset Password"}
             </Button>
           </Box>
         </form>

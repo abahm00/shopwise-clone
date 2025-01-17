@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { TextField, Button, Typography, Box, Grid } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Grid,
+  Alert,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -10,17 +20,30 @@ const Login = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = () => {
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
+    setError("");
+    return true;
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
+      setIsSubmitting(true);
       const response = await axios.get(
         "https://rebel-fishy-airship.glitch.me/users",
         {
@@ -38,10 +61,9 @@ const Login = () => {
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setEmail("");
-    setPassword("");
   };
 
   return (
@@ -60,7 +82,12 @@ const Login = () => {
         sm={8}
         md={6}
         lg={4}
-        sx={{ backgroundColor: "white", borderRadius: 2, boxShadow: 3, p: 3 }}
+        sx={{
+          backgroundColor: "white",
+          borderRadius: 2,
+          boxShadow: 3,
+          p: 3,
+        }}
       >
         <Typography
           variant="h5"
@@ -72,9 +99,9 @@ const Login = () => {
         </Typography>
 
         {error && (
-          <Typography variant="body2" color="error" align="center" gutterBottom>
+          <Alert severity="error" sx={{ mb: 2 }}>
             {error}
-          </Typography>
+          </Alert>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -86,17 +113,40 @@ const Login = () => {
               variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isSubmitting}
+              aria-label="Email"
             />
             <TextField
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"} // Toggles between text and password
               fullWidth
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isSubmitting}
+              aria-label="Password"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)} // Toggle password visibility
+                      edge="end"
+                      aria-label="toggle password visibility"
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
-            <Button type="submit" variant="contained" color="error" fullWidth>
-              Login
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              fullWidth
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </Box>
         </form>
@@ -113,12 +163,15 @@ const Login = () => {
           </Typography>
 
           <Box mt={1}>
+           <Typography variant="body2">
+            Don't remember your password?{" "}
             <span
               onClick={() => navigate("/forgot-password")}
               style={{ color: "#d32f2f", cursor: "pointer" }}
             >
               Forgot Password?
             </span>
+          </Typography>
           </Box>
         </Box>
       </Grid>

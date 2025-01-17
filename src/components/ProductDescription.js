@@ -102,6 +102,19 @@ export default function ProductDescription() {
     }
   };
 
+  // Helper function for generating size options
+  const generateSizeOptions = () => {
+    if (product.category === "jewelery") {
+      return Array.from({ length: 6 }, (_, i) => 19 + i);
+    }
+    return ["S", "M", "L", "XL"];
+  };
+
+  // Helper function for generating color options
+  const generateColorOptions = () => {
+    return ["red", "blue", "green", "black"];
+  };
+
   if (error) return <div className="text-center text-red-500">{error}</div>;
   if (!product)
     return (
@@ -131,6 +144,7 @@ export default function ProductDescription() {
             ${product.price}
           </span>
 
+          {/* Size Selection */}
           {product.category !== "electronics" && (
             <div className="mt-4">
               <label htmlFor="size" className="mr-2 text-gray-700">
@@ -143,21 +157,16 @@ export default function ProductDescription() {
                 className="p-2 border rounded-lg"
               >
                 <option value="">Select Size</option>
-                {product.category === "jewelery"
-                  ? Array.from({ length: 6 }, (_, i) => 19 + i).map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))
-                  : ["S", "M", "L", "XL"].map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))}
+                {generateSizeOptions().map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
               </select>
             </div>
           )}
 
+          {/* Color Selection */}
           {product.category !== "electronics" &&
             product.category !== "jewelery" && (
               <div className="mt-4">
@@ -171,14 +180,16 @@ export default function ProductDescription() {
                   className="p-2 border rounded-lg"
                 >
                   <option value="">Select Color</option>
-                  <option value="red">Red</option>
-                  <option value="blue">Blue</option>
-                  <option value="green">Green</option>
-                  <option value="black">Black</option>
+                  {generateColorOptions().map((color) => (
+                    <option key={color} value={color}>
+                      {color}
+                    </option>
+                  ))}
                 </select>
               </div>
             )}
 
+          {/* Quantity Selection */}
           <div className="mt-4">
             <label htmlFor="quantity" className="mr-2 text-gray-700">
               Quantity:
@@ -193,6 +204,7 @@ export default function ProductDescription() {
             />
           </div>
 
+          {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
             disabled={

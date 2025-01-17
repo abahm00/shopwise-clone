@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,30 +8,38 @@ export default function ProductPage() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const { searchQuery, category } = useParams();
+
+  const filterProducts = useCallback(
+    (data) => {
+      let filtered = data;
+      if (searchQuery) {
+        filtered = filtered.filter((product) =>
+          product.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      if (category) {
+        filtered = filtered.filter(
+          (product) => product.category.toLowerCase() === category.toLowerCase()
+        );
+      }
+      return filtered;
+    },
+    [searchQuery, category]
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setError(""); // Reset error state
         const response = await axios.get("https://fakestoreapi.com/products");
         setData(response.data);
-
-        let filtered = response.data;
-        if (searchQuery) {
-          filtered = filtered.filter((product) =>
-            product.title.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        }
-        if (category) {
-          filtered = filtered.filter(
-            (product) =>
-              product.category.toLowerCase() === category.toLowerCase()
-          );
-        }
-
+        const filtered = filterProducts(response.data);
         setFilteredData(filtered);
       } catch (error) {
+        setError("Error fetching products, please try again later.");
         console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
@@ -39,7 +47,7 @@ export default function ProductPage() {
     };
 
     fetchData();
-  }, [searchQuery, category]);
+  }, [filterProducts]);
 
   if (loading) {
     return (
@@ -55,9 +63,13 @@ export default function ProductPage() {
   return (
     <div className="h-fit flex justify-center bg-gray-100 p-4">
       <div className="w-full sm:w-2/3 lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredData.length === 0 ? (
-          <div className="text-center col-span-4 text-lg font-medium">
-            No products found.
+        {error ? (
+          <div className="text-center col-span-4 text-lg font-medium text-red-500">
+            {error}
+          </div>
+        ) : filteredData.length === 0 ? (
+          <div className="text-center col-span-4 text-lg font-medium text-gray-700">
+            No products found matching your criteria.
           </div>
         ) : (
           filteredData.map((product) => (

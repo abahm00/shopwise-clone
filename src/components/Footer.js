@@ -2,6 +2,20 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const footerLinks = [
+    {
+      label: "Privacy Policy",
+      to: "/privacy-policy",
+      ariaLabel: "Privacy Policy",
+    },
+    {
+      label: "Terms of Service",
+      to: "/terms-of-service",
+      ariaLabel: "Terms of Service",
+    },
+    { label: "Contact Us", to: "/contact-us", ariaLabel: "Contact Us" },
+  ];
+
   return (
     <footer className="bg-gray-800 text-white py-6 mt-auto">
       <div className="max-w-6xl mx-auto px-4">
@@ -13,24 +27,16 @@ const Footer = () => {
           </div>
 
           <div className="flex space-x-6">
-            <Link
-              className="text-sm hover:text-gray-400 cursor-pointer transition duration-300"
-              aria-label="Privacy Policy"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              className="text-sm hover:text-gray-400 cursor-pointer transition duration-300"
-              aria-label="Terms of Service"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              className="text-sm hover:text-gray-400 cursor-pointer transition duration-300"
-              aria-label="Contact Us"
-            >
-              Contact Us
-            </Link>
+            {footerLinks.map((link, index) => (
+              <Link
+                key={index}
+                to={link.to}
+                className="text-sm hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-300"
+                aria-label={link.ariaLabel}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
