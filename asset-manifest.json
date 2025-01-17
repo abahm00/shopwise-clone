@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/shopwise-clone/static/css/main.d291a529.css",
-    "main.js": "/shopwise-clone/static/js/main.0ae92f77.js",
+    "main.js": "/shopwise-clone/static/js/main.71e9426c.js",
     "static/js/453.c51ba163.chunk.js": "/shopwise-clone/static/js/453.c51ba163.chunk.js",
     "index.html": "/shopwise-clone/index.html",
     "main.d291a529.css.map": "/shopwise-clone/static/css/main.d291a529.css.map",
-    "main.0ae92f77.js.map": "/shopwise-clone/static/js/main.0ae92f77.js.map",
+    "main.71e9426c.js.map": "/shopwise-clone/static/js/main.71e9426c.js.map",
     "453.c51ba163.chunk.js.map": "/shopwise-clone/static/js/453.c51ba163.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d291a529.css",
-    "static/js/main.0ae92f77.js"
+    "static/js/main.71e9426c.js"
   ]
 }
